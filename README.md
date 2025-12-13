@@ -3,3 +3,6 @@
 # 目前的demo
 目前基于streamlit做了一个网页，用户可以调取["gpt-4o", "deepseek-chat", "glm-4", "gemini-3-pro-preview", "doubao-seed-1-6-250615"]实现算命，实现了前后文的记忆
 网站链接如下：https://ai-driven-fate-prediction-bnnr9exax3qj8uhcpssbbu.streamlit.app/
+# Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=shiyidege/AI-driven-fate-prediction&type=date&legend=top-left)](https://www.star-history.com/#shiyidege/AI-driven-fate-prediction&type=date&legend=top-left)
