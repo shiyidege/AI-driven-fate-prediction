@@ -1,3 +1,2 @@
-# 小题数据面试准备
-## 主要复现datawhale的大模型教程：https://github.com/datawhalechina/llm-universe/blob/main/notebook/C3%20%E6%90%AD%E5%BB%BA%E7%9F%A5%E8%AF%86%E5%BA%93/C3.ipynb
-## 还有flask跟 fastAPI的相关知识
+# 知命阁-AI算命项目
+## 我们的项目是基于LLM工程的算命网站和APP搭建，主要使用LLM API调取，Prompt Engineering、知识库搭建，RAG，系统评估和优化等方法，通过导入周易、梅花易数、塔罗牌等书籍跟历史算命结果，通过用户输入或选择相关信息的方式，产出用户的算命结果，为用户的感情，事业，学习，风水选择等方面提供指导和心理安慰。
