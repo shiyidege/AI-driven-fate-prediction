@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知命阁 - AI算命项目</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- GSAP 动画库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        
+        :root {
+            --primary-color: #6C2BD9;
+            --secondary-color: #D4AF37;
+            --accent-color: #9D2933;
+            --dark-color: #1A1A1A;
+            --light-color: #F5F5F5;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #0a0a0a;
+            color: var(--light-color);
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Noto Serif SC', serif;
+        }
+        
+        .bg-primary {
+            background-color: var(--primary-color);
+        }
+        
+        .bg-secondary {
+            background-color: var(--secondary-color);
+        }
+        
+        .bg-accent {
+            background-color: var(--accent-color);
+        }
+        
+        .text-primary {
+            color: var(--primary-color);
+        }
+        
+        .text-secondary {
+            color: var(--secondary-color);
+        }
+        
+        .text-accent {
+            color: var(--accent-color);
+        }
+        
+        .border-primary {
+            border-color: var(--primary-color);
+        }
+        
+        .border-secondary {
+            border-color: var(--secondary-color);
+        }
+        
+        .border-accent {
+            border-color: var(--accent-color);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #5a23b5;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(108, 43, 217, 0.3);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: #1A1A1A;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #c0992e;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(212, 175, 55, 0.3);
+        }
+        
+        .card {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(108, 43, 217, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(108, 43, 217, 0.2);
+            border-color: rgba(108, 43, 217, 0.5);
+        }
+        
+        .service-card {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(40, 20, 80, 0.8) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            transition: all 0.4s ease;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
+            opacity: 0;
+        }
+        
+        .service-card:hover::before {
+            animation: shine 1.5s;
+            opacity: 1;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px -12px rgba(108, 43, 217, 0.3);
+            border-color: rgba(212, 175, 55, 0.6);
+        }
+        
+        @keyframes shine {
+            0% {
+                left: -100%;
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                left: 100%;
+                opacity: 0;
+            }
+        }
+        
+        .banner {
+            background-image: url('https://p9-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/a16ceebdf1ee471fbbf45a196ee0b651~tplv-a9rns2rl98-image.image?rcl=20260103154722B506331F0D6B9DC7B41C&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1770018482&x-signature=SjsTc2Y701I4dOU7OZ3go5Ztx1k%3D');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(108, 43, 217, 0.7));
+        }
+        
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--secondary-color);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(40, 20, 80, 0.9) 100%);
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid var(--secondary-color);
+            width: 80%;
+            max-width: 800px;
+            position: relative;
+            animation: modalFadeIn 0.5s;
+            border-radius: 10px;
+        }
+        
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .close {
+            color: var(--secondary-color);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .close:hover {
+            color: white;
+            transform: rotate(90deg);
+        }
+        
+        .form-input {
+            background-color: rgba(26, 26, 26, 0.8);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+        }
+        
+        .model-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .model-option {
+            padding: 8px 15px;
+            background-color: rgba(26, 26, 26, 0.8);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+        }
+        
+        .model-option:hover {
+            background-color: rgba(212, 175, 55, 0.2);
+            border-color: var(--secondary-color);
+        }
+        
+        .model-option.selected {
+            background-color: var(--secondary-color);
+            color: #1A1A1A;
+            border-color: var(--secondary-color);
+        }
+        
+        .result-section {
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+        
+        .result-section.show {
+            opacity: 1;
+            max-height: 2000px;
+        }
+        
+        .loading-animation {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+        
+        .loading-animation div {
+            position: absolute;
+            top: 33px;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            animation-timing-function: cubic-bezier(0, 1, 1, 0);
+        }
+        
+        .loading-animation div:nth-child(1) {
+            left: 8px;
+            animation: loading-animation1 0.6s infinite;
+        }
+        
+        .loading-animation div:nth-child(2) {
+            left: 8px;
+            animation: loading-animation2 0.6s infinite;
+        }
+        
+        .loading-animation div:nth-child(3) {
+            left: 32px;
+            animation: loading-animation2 0.6s infinite;
+        }
+        
+        .loading-animation div:nth-child(4) {
+            left: 56px;
+            animation: loading-animation3 0.6s infinite;
+        }
+        
+        @keyframes loading-animation1 {
+            0% {
+                transform: scale(0);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes loading-animation3 {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(0);
+            }
+        }
+        
+        @keyframes loading-animation2 {
+            0% {
+                transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(24px, 0);
+            }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+            
+            .service-card {
+                margin-bottom: 20px;
+            }
+            
+            .model-selector {
+                justify-content: center;
+            }
+        }
+        
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1A1A1A;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5a23b5;
+        }
+    </style>
+</head>
+<body>
+    <!-- 3D背景容器 -->
+    <div id="canvas-container"></div>
+    
+    <!-- 导航栏 -->
+    <nav class="bg-dark bg-opacity-90 backdrop-blur-md fixed w-full z-50 border-b border-primary border-opacity-30">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/a475d4f7c0364550a0892ce13650e350~tplv-a9rns2rl98-image.image?rcl=20260103154722B506331F0D6B9DC7B41C&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1770018472&x-signature=E2j0SHrHWJidmG0%2BKfGfgKEXq6E%3D" alt="知命阁" class="h-12 mr-3">
+                    <span class="text-2xl font-bold text-secondary">知命阁</span>
+                </div>
+                
+                <!-- 桌面导航 -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="#" class="nav-link text-white hover:text-secondary">首页</a>
+                    <a href="#services" class="nav-link text-white hover:text-secondary">算命服务</a>
+                    <a href="#about" class="nav-link text-white hover:text-secondary">关于我们</a>
+                    <a href="#contact" class="nav-link text-white hover:text-secondary">联系方式</a>
+                </div>
+                
+                <!-- 移动端菜单按钮 -->
+                <div class="md:hidden">
+                    <button id="menu-toggle" class="text-white focus:outline-none">
+                        <i class="fas fa-bars text-2xl text-secondary"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 移动端导航菜单 -->
+            <div id="mobile-menu" class="md:hidden hidden pt-4 pb-2">
+                <a href="#" class="block py-2 text-white hover:text-secondary">首页</a>
+                <a href="#services" class="block py-2 text-white hover:text-secondary">算命服务</a>
+                <a href="#about" class="block py-2 text-white hover:text-secondary">关于我们</a>
+                <a href="#contact" class="block py-2 text-white hover:text-secondary">联系方式</a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- 横幅 -->
+    <section class="banner min-h-screen flex items-center justify-center pt-16">
+        <div class="container mx-auto px-4 py-20 relative z-10">
+            <div class="text-center max-w-3xl mx-auto">
+                <h1 class="text-4xl md:text-6xl font-bold mb-6 text-white">
+                    <span class="text-secondary">AI</span> 算命 · 预知未来
+                </h1>
+                <p class="text-xl md:text-2xl mb-10 text-gray-200">
+                    结合传统周易、梅花易数、塔罗牌与现代AI技术，为您提供精准命理分析
+                </p>
+                <div class="flex flex-col md:flex-row justify-center gap-4">
+                    <a href="#services" class="btn-primary px-8 py-3 rounded-full text-lg font-medium">
+                        开始算命
+                    </a>
+                    <a href="#about" class="btn-secondary px-8 py-3 rounded-full text-lg font-medium">
+                        了解更多
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 服务 -->
+    <section id="services" class="py-20 bg-gradient-to-b from-dark to-primary bg-opacity-90">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-bold mb-4 text-white">
+                    算命服务
+                </h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    选择您感兴趣的算命方式，输入相关信息，AI将为您提供专业的命理分析
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- 周易算命 -->
+                <div class="service-card rounded-xl p-6 text-center" onclick="openModal('zhouyi-modal')">
+                    <div class="w-32 h-32 mx-auto mb-6 rounded-full bg-primary bg-opacity-20 flex items-center justify-center">
+                        <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/c5d1ff6adef9475e87ea0c6216565f4b~tplv-a9rns2rl98-image.image?rcl=20260103154722B506331F0D6B9DC7B41C&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1770018495&x-signature=i1xgjS75%2FJAvsQuF0ifJ74wHFfQ%3D" alt="周易算命" class="w-24 h-24 object-contain">
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-secondary">周易算命</h3>
+                    <p class="text-gray-300 mb-6">
+                        基于周易六十四卦象，结合您的出生信息和问题，为您解析人生运势、事业、感情等方面的发展趋势。
+                    </p>
+                    <button class="btn-primary px-6 py-2 rounded-full">
+                        开始测算
+                    </button>
+                </div>
+                
+                <!-- 梅花易数 -->
+                <div class="service-card rounded-xl p-6 text-center" onclick="openModal('meihua-modal')">
+                    <div class="w-32 h-32 mx-auto mb-6 rounded-full bg-primary bg-opacity-20 flex items-center justify-center">
+                        <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/0c93232fd2b14d3faeda53cab81f288e~tplv-a9rns2rl98-image.image?rcl=20260103154722B506331F0D6B9DC7B41C&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1770018494&x-signature=VKJPR%2FrK7rj5SuFEgk%2FXCK2O5p8%3D" alt="梅花易数" class="w-24 h-24 object-contain">
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-secondary">梅花易数</h3>
+                    <p class="text-gray-300 mb-6">
+                        宋代邵雍所创，通过时间、数字等随机因素起卦，为您预测近期运势变化，解答具体问题。
+                    </p>
+                    <button class="btn-primary px-6 py-2 rounded-full">
+                        开始测算
+                    </button>
+                </div>
+                
+                <!-- 塔罗牌 -->
+                <div class="service-card rounded-xl p-6 text-center" onclick="openModal('tarot-modal')">
+                    <div class="w-32 h-32 mx-auto mb-6 rounded-full bg-primary bg-opacity-20 flex items-center justify-center">
+                        <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/42336817cc214818b93a275005bf5b07~tplv-a9rns2rl98-image.image?rcl=20260103154722B506331F0D6B9DC7B41C&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1770018497&x-signature=BiqOYmD%2FvOsh3UPaLd6KrCemkic%3D" alt="塔罗牌" class="w-24 h-24 object-contain">
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-secondary">塔罗牌占卜</h3>
+                    <p class="text-gray-300 mb-6">
+                        西方古老的占卜工具，通过抽取牌阵，为您解读当前状态、未来趋势以及应对建议。
+                    </p>
+                    <button class="btn-primary px-6 py-2 rounded-full">
+                        开始测算
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 关于我们 -->
+    <section id="about" class="py-20 bg-dark">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl md:text-5xl font-bold mb-6 text-white">
+                        关于 <span class="text-secondary">知命阁</span>
+                    </h2>
+                    <p class="text-lg text-gray-300 mb-6">
+                        知命阁是一家结合传统命理文化与现代AI技术的创新平台，我们致力于为用户提供专业、准确的命理分析服务。
+                    </p>
+                    <p class="text-lg text-gray-300 mb-6">
+                        我们的团队由资深命理学家和AI工程师组成，通过深度学习和大数据分析，将传统命理学术与现代科技完美融合，为您提供个性化的命理解读。
+                    </p>
+                    <p class="text-lg text-gray-300">
+                        无论您是想了解事业发展、感情婚姻、财运健康，还是对未来感到迷茫，知命阁都能为您提供专业的指导和建议。
+                    </p>
+                </div>
+                <div class="card rounded-xl p-8">
+                    <h3 class="text-2xl font-bold mb-6 text-secondary">我们的优势</h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-secondary mt-1 mr-3"></i>
+                            <span class="text-gray-300">结合传统命理与现代AI技术，提供更精准的分析</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-secondary mt-1 mr-3"></i>
+                            <span class="text-gray-300">多种算命方式，满足不同用户需求</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-secondary mt-1 mr-3"></i>
+                            <span class="text-gray-300">专业命理学家团队，确保解读的准确性</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-secondary mt-1 mr-3"></i>
+                            <span class="text-gray-300">用户可选择不同AI模型，体验多样化的解读风格</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-secondary mt-1 mr-3"></i>
+                            <span class="text-gray-300">历史记录保存，方便用户追踪运势变化</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 联系方式 -->
+    <section id="contact" class="py-20 bg-gradient-to-b from-primary bg-opacity-90 to-dark">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-5xl font-bold mb-4 text-white">
+                    联系我们
+                </h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    如果您有任何问题或建议，欢迎随时联系我们
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="card rounded-xl p-6 text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-primary bg-opacity-20 flex items-center justify-center">
+                        <i class="fas fa-envelope text-2xl text-secondary"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 text-white">邮箱</h3>
+                    <p class="text-gray-300">contact@zhimingge.com</p>
+                </div>
+                
+                <div class="card rounded-xl p-6 text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-primary bg-opacity-20 flex items-center justify-center">
+                        <i class="fas fa-phone-alt text-2xl text-secondary"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 text-white">电话</h3>
+                    <p class="text-gray-300">400-123-4567</p>
+                </div>
+                
+                <div class="card rounded-xl p-6 text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-primary bg-opacity-20 flex items-center justify-center">
+                        <i class="fas fa-map-marker-alt text-2xl text-secondary"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 text-white">地址</h3>
+                    <p class="text-gray-300">北京市朝阳区建国路88号</p>
+                </div>
+            </div>
+            
+            <div class="mt-16 max-w-3xl mx-auto">
+                <form class="card rounded-xl p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label for="name" class="block mb-2 text-gray-300">姓名</label>
+                            <input type="text" id="name" class="form-input w-full px-4 py-2 rounded-lg" placeholder="请输入您的姓名">
+                        </div>
+                        <div>
+                            <label for="email" class="block mb-2 text-gray-300">邮箱</label>
+                            <input type="email" id="email" class="form-input w-full px-4 py-2 rounded-lg" placeholder="请输入您的邮箱">
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label for="subject" class="block mb-2 text-gray-300">主题</label>
+                        <input type="text" id="subject" class="form-input w-full px-4 py-2 rounded-lg" placeholder="请输入主题">
+                    </div>
+                    <div class="mb-6">
+                        <label for="message" class="block mb-2 text-gray-300">留言</label>
+                        <textarea id="message" rows="5" class="form-input w-full px-4 py-2 rounded-lg" placeholder="请输入您的留言"></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary w-full py-3 rounded-lg text-lg font-medium">
+                        提交
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 页脚 -->
+    <footer class="bg-dark py-10 border-t border-primary border-opacity-30">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <div class="flex items-center">
+                        <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/a475d4f7c0364550a0892ce13650e350~tplv-a9rns2rl98-image.image?rcl=20260103154722B506331F0D6B9DC7B41C&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1770018472&x-signature=E2j0SHrHWJidmG0%2BKfGfgKEXq6E%3D" alt="知命阁" class="h-10 mr-3">
+                        <span class="text-xl font-bold text-secondary">知命阁</span>
+                    </div>
+                    <p class="text-gray-400 mt-2">AI算命 · 预知未来</p>
+                </div>
+                
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-secondary transition-colors">
+                        <i class="fab fa-weixin text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-secondary transition-colors">
+                        <i class="fab fa-weibo text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-secondary transition-colors">
+                        <i class="fab fa-qq text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-secondary transition-colors">
+                        <i class="fab fa-tiktok text-2xl"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500">
+                <p>&copy; 2025 知命阁 AI算命项目. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- 周易算命模态框 -->
+    <div id="zhouyi-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('zhouyi-modal')">&times;</span>
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-secondary">周易算命</h2>
+                <p class="text-gray-300 mt-2">基于周易六十四卦象的AI智能解读</p>
+            </div>
+            
+            <form id="zhouyi-form">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block mb-2 text-gray-300">出生年份</label>
+                        <select class="form-input w-full px-4 py-2 rounded-lg" required>
+                            <option value="">请选择年份</option>
+                            <!-- 动态生成年份选项 -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-gray-300">性别</label>
+                        <select class="form-input w-full px-4 py-2 rounded-lg" required>
+                            <option value="">请选择性别</option>
+                            <option value="male">男</option>
+                            <option value="female">女</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block mb-2 text-gray-300">您想了解的问题</label>
+                    <select class="form-input w-full px-4 py-2 rounded-lg mb-4" required>
+                        <option value="">请选择问题类型</option>
+                        <option value="career">事业发展</option>
+                        <option value="relationship">感情婚姻</option>
+                        <option value="wealth">财运运势</option>
+                        <option value="health">健康状况</option>
+                        <option value="other">其他问题</option>
+                    </select>
+                    <textarea class="form-input w-full px-4 py-2 rounded-lg" rows="4" placeholder="请详细描述您的问题..."></textarea>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block mb-2 text-gray-300">选择AI模型</label>
+                    <div class="model-selector">
+                        <div class="model-option" data-model="gemini">Gemini</div>
+                        <div class="model-option" data-model="doubao">豆包</div>
+                        <div class="model-option" data-model="zhipu">智谱清言</div>
+                        <div class="model-option" data-model="wenxin">文心一言</div>
+                        <div class="model-option" data-model="deepseek">DeepSeek</div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <button type="button" class="btn-primary px-8 py-3 rounded-full text-lg font-medium" onclick="generateZhouyiResult()">
+                        开始测算
+                    </button>
+                </div>
+            </form>
+            
+            <!-- 结果区域 -->
+            <div id="zhouyi-result" class="result-section mt-8 pt-8 border-t border-secondary border-opacity-30">
+                <div class="text-center mb-8">
+                    <h3 class="text-2xl font-bold text-secondary">测算结果</h3>
+                    <p class="text-gray-300 mt-2">根据您提供的信息，AI为您生成的周易解读</p>
+                </div>
+                
+                <div class="mb-6 p-6 bg-dark bg-opacity-50 rounded-lg border border-secondary border-opacity-20">
+                    <h4 class="text-xl font-bold mb-4 text-white">卦象分析</h4>
+                    <p class="text-gray-300" id="zhouyi-hexagram"></p>
+                </div>
+                
+                <div class="mb-6 p-6 bg-dark bg-opacity-50 rounded-lg border border-secondary border-opacity-20">
+                    <h4 class="text-xl font-bold mb-4 text-white">运势解读</h4>
+                    <p class="text-gray-300" id="zhouyi-reading"></p>
+                </div>
+                
+                <div class="mb-6 p-6 bg-dark bg-opacity-50 rounded-lg border border-secondary border-opacity-20">
+                    <h4 class="text-xl font-bold mb-4 text-white">建议与指导</h4>
+                    <p class="text-gray-300" id="zhouyi-advice"></p>
+                </div>
+                
+                <div class="flex justify-between mt-8">
+                    <button class="btn-secondary px-6 py-2 rounded-full" onclick="saveResult('zhouyi')">
+                        <i class="fas fa-save mr-2"></i> 保存结果
+                    </button>
+                    <button class="btn-primary px-6 py-2 rounded-full" onclick="shareResult('zhouyi')">
+                        <i class="fas fa-share-alt mr-2"></i> 分享结果
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 梅花易数模态框 -->
+    <div id="meihua-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('meihua-modal')">&times;</span>
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-secondary">梅花易数</h2>
+                <p class="text-gray-300 mt-2">宋代邵雍所创的易学预测方法</p>
+            </div>
+            
+            <form id="meihua-form">
+                <div class="mb-6">
+                    <label class="block mb-2 text-gray-300">预测方式</label>
+                    <select class="form-input w-full px-4 py-2 rounded-lg" required>
+                        <option value="">请选择预测方式</option>
+                        <option value="time">时间起卦</option>
+                        <option value="number">数字起卦</option>
+                        <option value="word">文字起卦</option>
+                    </select>
+                </div>
+                
+                <div id="time-method" class="mb-6 hidden">
+                    <label class="block mb-2 text-gray-300">选择时间</label>
+                    <input type="datetime-local" class="form-input w-full px-4 py-2 rounded-lg">
+                </div>
+                
+                <div id="number-method" class="mb-6 hidden">
+                    <label class="block mb-2 text-gray-300">输入数字（1-999）</label>
+                    <input type="number" min="1" max="999" class="form-input w-full px-4 py-2 rounded-lg" placeholder="请输入1-999之间的数字">
+                </div>
+                
+                <div id="word-method" class="mb-6 hidden">
+                    <label class="block mb-2 text-gray-300">输入文字（1-7字）</label>
+                    <input type="text" maxlength="7" class="form-input w-full px-4 py-2 rounded-lg" placeholder="请输入1-7个汉字">
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block mb-2 text-gray-300">您想预测的问题</label>
+                    <textarea class="form-input w-full px-4 py-2 rounded-lg" rows="4" placeholder="请详细描述您想预测的问题..."></textarea>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block mb-2 text-gray-300">选择AI模型</label>
+                    <div class="model-selector">
+                        <div class="model-option" data-model="gemini">Gemini</div>
+                        <div class="model-option" data-model="doubao">豆包</div>
+                        <div class="model-option" data-model="zhipu">智谱清言</div>
+                        <div class="model-option" data-model="wenxin">文心一言</div>
+                        <div class="model-option" data-model="deepseek">DeepSeek</div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <button type="button" class="btn-primary px-8 py-3 rounded-full text-lg font-medium" onclick="generateMeihuaResult()">
+                        开始测算
+                    </button>
+                </div>
+            </form>
+            
+            <!-- 结果区域 -->
+            <div id="meihua-result" class="result-section mt-8 pt-8 border-t border-secondary border-opacity-30">
+                <div class="text-center mb-8">
+                    <h3 class="text-2xl font-bold text-secondary">测算结果</h3>
+                    <p class="text-gray-300 mt-2">根据您提供的信息，AI为您生成的梅花易数解读</p>
+                </div>
+                
+                <div class="mb-6 p-6 bg-dark bg-opacity-50 rounded-lg border border-secondary border-opacity-20">
+                    <h4 class="text-xl font-bold mb-4 text-white">卦象分析</h4>
+                    <p class="text-gray-300" id="meihua-hexagram"></p>
+                </div>
+                
+                <div class="mb-6 p-6 bg-dark bg-opacity-50 rounded-lg border border-secondary border-opacity-20">
+                    <h4 class="text-xl font-bold mb-4 text-white">运势解读</h4>
+                    <p class="text-gray-300" id="meihua-reading"></p>
+                </div>
+                
+                <div class="mb-6 p-6 bg-dark bg-opacity-50 rounded-lg border border-secondary border-opacity-20">
+                    <h4 class="text-xl font-bold mb-4 text-white">建议与指导</h4>
+                    <p class="text-gray-300" id="meihua-advice"></p>
+                </div>
+                
+                <div class="flex justify-between mt-8">
+                    <button class="btn-secondary px-6 py-2 rounded-full" onclick="saveResult('meihua')">
+                        <i class="fas fa-save mr-2"></i> 保存结果
+                    </button>
+                    <button class="btn-primary px-6 py-2 rounded-full" onclick="shareResult('meihua')">
+                        <i class="fas fa-share-alt mr-2"></i> 分享结果
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 塔罗牌模态框 -->
+    <div id="tarot-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('tarot-modal')">&times;</span>
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-secondary">塔罗牌占卜</h2>
+                <p class="text-gray-300 mt-2">西方古老的神秘学占卜工具</p>
+            </div>
+            
+            <form id="tarot-form">
+                <div class="mb-6">
+                    <label class="block mb-2 text-gray-300">牌阵选择</label>
+                    <select class="form-input w-full px-4 py-2 rounded-lg" required>
+                        <option value="">请选择牌阵</option>
+                        <option value="single">单牌占卜</option>
+                        <option value="three">三牌阵</option>
+                        <option value="celtic">凯尔特十字</option>
+                        <option value="relationship">爱情牌阵</option>
+                    </select>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block mb-2 text-gray-300">您想占卜的问题</label>
+                    <textarea class="form-input w-full px-4 py-2 rounded-lg" rows="4" placeholder="请详细描述您想占卜的问题..."></textarea>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block mb-2 text-gray-300">选择AI模型</label>
+                    <div class="model-selector">
+                        <div class="model-option" data-model="gemini">Gemini</div>
+                        <div class="model-option" data-model="doubao">豆包</div>
+                        <div class="model-option" data-model="zhipu">智谱清言</div>
+                        <div class="model-option" data-model="wenxin">文心一言</div>
+                        <div class="model-option" data-model="deepseek">DeepSeek</div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <button type="button" class="btn-primary px-8 py-3 rounded-full text-lg font-medium" onclick="generateTarotResult()">
+                        开始抽牌
+                    </button>
+                </div>
+            </form>
+            
+            <!-- 结果区域 -->
+            <div id="tarot-result" class="result-section mt-8 pt-8 border-t border-secondary border-opacity-30">
+                <div class="text-center mb-8">
+                    <h3 class="text-2xl font-bold text-secondary">占卜结果</h3>
+                    <p class="text-gray-300 mt-2">根据您的问题，AI为您抽取的塔罗牌解读</p>
+                </div>
+                
+                <div id="tarot-cards" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- 塔罗牌将在这里动态生成 -->
+                </div>
+                
+                <div class="mb-6 p-6 bg-dark bg-opacity-50 rounded-lg border border-secondary border-opacity-20">
+                    <h4 class="text-xl font-bold mb-4 text-white">综合解读</h4>
+                    <p class="text-gray-300" id="tarot-reading"></p>
+                </div>
+                
+                <div class="mb-6 p-6 bg-dark bg-opacity-50 rounded-lg border border-secondary border-opacity-20">
+                    <h4 class="text-xl font-bold mb-4 text-white">建议与指导</h4>
+                    <p class="text-gray-300" id="tarot-advice"></p>
+                </div>
+                
+                <div class="flex justify-between mt-8">
+                    <button class="btn-secondary px-6 py-2 rounded-full" onclick="saveResult('tarot')">
+                        <i class="fas fa-save mr-2"></i> 保存结果
+                    </button>
+                    <button class="btn-primary px-6 py-2 rounded-full" onclick="shareResult('tarot')">
+                        <i class="fas fa-share-alt mr-2"></i> 分享结果
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化3D背景
+            initThreeBackground();
+            
+            // 初始化年份选择器
+            initYearSelector();
+            
+            // 初始化梅花易数预测方式切换
+            initMeihuaMethodSwitch();
+            
+            // 初始化模型选择器
+            initModelSelector();
+            
+            // 初始化GSAP动画
+            initAnimations();
+            
+            // 移动端菜单切换
+            document.getElementById('menu-toggle').addEventListener('click', function() {
+                document.getElementById('mobile-menu').classList.toggle('hidden');
+            });
+            
+            // 平滑滚动
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                        
+                        // 如果是移动端，点击后关闭菜单
+                        document.getElementById('mobile-menu').classList.add('hidden');
+                    }
+                });
+            });
+        });
+        
+        // 初始化3D背景
+        function initThreeBackground() {
+            const container = document.getElementById('canvas-container');
+            
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            
+            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 0);
+            container.appendChild(renderer.domElement);
+            
+            // 创建粒子系统
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 1500;
+            
+            const posArray = new Float32Array(particlesCount * 3);
+            
+            for (let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 5;
+            }
+            
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.005,
+                color: 0xD4AF37,
+                transparent: true,
+                opacity: 0.8
+            });
+            
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+            
+            camera.position.z = 2;
+            
+            // 动画循环
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                particlesMesh.rotation.y += 0.001;
+                particlesMesh.rotation.x += 0.0005;
+                
+                renderer.render(scene, camera);
+            }
+            
+            animate();
+            
+            // 响应窗口大小变化
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+        
+        // 初始化年份选择器
+        function initYearSelector() {
+            const yearSelects = document.querySelectorAll('select:first-child');
+            const currentYear = new Date().getFullYear();
+            const startYear = currentYear - 100;
+            
+            yearSelects.forEach(select => {
+                for (let year = currentYear; year >= startYear; year--) {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year + '年';
+                    select.appendChild(option);
+                }
+            });
+        }
+        
+        // 初始化梅花易数预测方式切换
+        function initMeihuaMethodSwitch() {
+            const methodSelect = document.querySelector('#meihua-form select');
+            const timeMethod = document.getElementById('time-method');
+            const numberMethod = document.getElementById('number-method');
+            const wordMethod = document.getElementById('word-method');
+            
+            if (methodSelect && timeMethod && numberMethod && wordMethod) {
+                methodSelect.addEventListener('change', function() {
+                    timeMethod.classList.add('hidden');
+                    numberMethod.classList.add('hidden');
+                    wordMethod.classList.add('hidden');
+                    
+                    if (this.value === 'time') {
+                        timeMethod.classList.remove('hidden');
+                    } else if (this.value === 'number') {
+                        numberMethod.classList.remove('hidden');
+                    } else if (this.value === 'word') {
+                        wordMethod.classList.remove('hidden');
+                    }
+                });
+            }
+        }
+        
+        // 初始化模型选择器
+        function initModelSelector() {
+            const modelOptions = document.querySelectorAll('.model-option');
+            
+            modelOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // 移除同一组中其他选项的选中状态
+                    const parent = this.parentElement;
+                    parent.querySelectorAll('.model-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // 添加当前选项的选中状态
+                    this.classList.add('selected');
+                });
+            });
+        }
+        
+        // 初始化GSAP动画
+        function initAnimations() {
+            // 页面加载动画
+            gsap.from('nav', { y: -100, opacity: 0, duration: 1, ease: 'power3.out' });
+            gsap.from('.banner h1', { y: 50, opacity: 0, duration: 1, delay: 0.5, ease: 'power3.out' });
+            gsap.from('.banner p', { y: 50, opacity: 0, duration: 1, delay: 0.8, ease: 'power3.out' });
+            gsap.from('.banner .btn-primary, .banner .btn-secondary', { y: 50, opacity: 0, duration: 1, delay: 1.1, ease: 'power3.out', stagger: 0.2 });
+            
+            // 滚动触发动画
+            gsap.registerPlugin(ScrollTrigger);
+            
+            gsap.utils.toArray('.service-card').forEach(card => {
+                gsap.from(card, {
+                    y: 50,
+                    opacity: 0,
+                    duration: 1,
+                    scrollTrigger: {
+                        trigger: card,
+                        start: 'top 80%',
+                        toggleActions: 'play none none none'
+                    },
+                    ease: 'power3.out'
+                });
+            });
+            
+            gsap.from('#about h2', {
+                y: 50,
+                opacity: 0,
+                duration: 1,
+                scrollTrigger: {
+                    trigger: '#about',
+                    start: 'top 80%',
+                    toggleActions: 'play none none none'
+                },
+                ease: 'power3.out'
+            });
+            
+            gsap.from('#about p', {
+                y: 30,
+                opacity: 0,
+                duration: 1,
+                delay: 0.3,
+                scrollTrigger: {
+                    trigger: '#about',
+                    start: 'top 80%',
+                    toggleActions: 'play none none none'
+                },
+                ease: 'power3.out',
+                stagger: 0.2
+            });
+            
+            gsap.from('#about .card', {
+                x: 50,
+                opacity: 0,
+                duration: 1,
+                delay: 0.6,
+                scrollTrigger: {
+                    trigger: '#about',
+                    start: 'top 80%',
+                    toggleActions: 'play none none none'
+                },
+                ease: 'power3.out'
+            });
+        }
+        
+        // 打开模态框
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // 关闭模态框
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+            
+            // 重置表单和结果
+            const modal = document.getElementById(modalId);
+            const form = modal.querySelector('form');
+            const result = modal.querySelector('.result-section');
+            
+            if (form) form.reset();
+            if (result) {
+                result.classList.remove('show');
+                result.style.display = 'none';
+            }
+            
+            // 重置模型选择器
+            const modelOptions = modal.querySelectorAll('.model-option');
+            modelOptions.forEach(option => {
+                option.classList.remove('selected');
+            });
+        }
+        
+        // 生成周易结果
+        function generateZhouyiResult() {
+            const modal = document.getElementById('zhouyi-modal');
+            const result = document.getElementById('zhouyi-result');
+            const selectedModel = modal.querySelector('.model-option.selected');
+            
+            if (!selectedModel) {
+                alert('请选择一个AI模型');
+                return;
+            }
+            
+            // 显示加载动画
+            result.style.display = 'block';
+            result.innerHTML = `
+                <div class="text-center py-10">
+                    <div class="loading-animation mx-auto mb-6">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <p class="text-xl text-gray-300">正在使用 ${selectedModel.textContent} 生成结果，请稍候...</p>
+                </div>
+            `;
+            
+            // 模拟API调用延迟
+            setTimeout(() => {
+                // 生成随机卦象
+                const hexagrams = [
+                    '乾为天', '坤为地', '水雷屯', '山水蒙', '水天需', '天水讼', '地水师', '水地比',
+                    '风天小畜', '天泽履', '地天泰', '天地否', '天火同人', '火天大有', '地山谦', '雷地豫',
+                    '泽雷随', '山风蛊', '地泽临', '风地观', '火雷噬嗑', '山火贲', '山地剥', '地雷复',
+                    '天雷无妄', '山天大畜', '山雷颐', '泽风大过', '坎为水', '离为火', '泽山咸', '雷风恒',
+                    '天山遁', '雷天大壮', '火地晋', '地火明夷', '风火家人', '火泽睽', '水山蹇', '雷水解',
+                    '山泽损', '风雷益', '泽天夬', '天风姤', '泽地萃', '地风升', '泽水困', '水风井',
+                    '泽火革', '火风鼎', '震为雷', '艮为山', '风山渐', '雷泽归妹', '雷火丰', '火山旅',
+                    '巽为风', '兑为泽', '风水涣', '水泽节', '风泽中孚', '雷山小过', '水火既济', '火水未济'
+                ];
+                
+                const randomHexagram = hexagrams[Math.floor(Math.random() * hexagrams.length)];
+                
+                // 根据选择的模型生成不同风格的解读
+                let reading = '';
+                let advice = '';
+                
+                switch (selectedModel.dataset.model) {
+                    case 'gemini':
+                        reading = `根据周易卦象"${randomHexagram}"，您当前处于一个转折点。过去的努力即将迎来回报，但仍需保持谨慎。事业上可能会有新的机会出现，感情方面则需要更多的沟通和理解。`;
+                        advice = `建议您保持开放的心态，积极面对变化。在决策时，既要考虑自身利益，也要兼顾他人感受。近期适合学习新知识，提升自己的能力，为未来的发展打下坚实基础。`;
+                        break;
+                    case 'doubao':
+                        reading = `"${randomHexagram}"卦象显示，您的运势正处于上升期。工作上可能会得到上级的认可和赏识，有晋升或加薪的机会。感情方面，如果您已有伴侣，则关系会更加稳定；如果您单身，则可能会遇到志同道合的人。`;
+                        advice = `建议您把握当前的有利时机，勇敢追求自己的目标。同时，也要注意保持身心健康，合理安排工作和休息时间。在人际交往中，要真诚待人，这样才能建立良好的人际关系。`;
+                        break;
+                    case 'zhipu':
+                        reading = `从"${randomHexagram}"卦象来看，您目前的处境较为复杂，既有挑战也有机遇。在事业上，您可能需要面对一些困难和阻碍，但只要坚持不懈，最终会取得成功。感情方面，可能会出现一些误会或分歧，需要及时沟通解决。`;
+                        advice = `建议您保持冷静和理性，不要被情绪左右。在做决定之前，要充分考虑各种可能性，并做好应对各种情况的准备。同时，也要学会灵活变通，根据实际情况调整自己的计划和策略。`;
+                        break;
+                    case 'wenxin':
+                        reading = `"${randomHexagram}"卦象表明，您的运势总体向好。在工作中，您的能力和才华会得到充分发挥，有望取得不错的成绩。感情方面，您会感受到更多的温暖和关爱，家庭关系也会更加和谐。`;
+                        advice = `建议您珍惜当前的美好时光，同时也要为未来做好规划。在事业上，要继续努力提升自己的专业能力；在生活中，要多关心家人和朋友，营造温馨和谐的氛围。`;
+                        break;
+                    case 'deepseek':
+                        reading = `根据"${randomHexagram}"卦象分析，您正处于一个重要的发展阶段。在事业上，您可能会面临一些选择和挑战，需要谨慎决策。感情方面，您可能会遇到一些波折，但最终会找到属于自己的幸福。`;
+                        advice = `建议您保持积极乐观的心态，勇敢面对生活中的各种挑战。在做决定时，要充分考虑自己的真实需求和长远利益。同时，也要学会倾听他人的意见和建议，这样才能做出更加明智的选择。`;
+                        break;
+                    default:
+                        reading = `从"${randomHexagram}"卦象来看，您的未来充满了可能性。在事业和生活中，您会遇到各种机遇和挑战，需要保持积极的心态去面对。`;
+                        advice = `建议您相信自己的直觉和判断，同时也要理性分析各种情况。在前进的道路上，要保持谦虚和学习的态度，不断提升自己的能力和素质。`;
+                }
+                
+                // 更新结果内容
+                result.innerHTML = `
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold text-secondary">测算结果</h3>
+                        <p class="text-gray-300 mt-2">使用 ${selectedModel.textContent} 生成的周易解读</p>
+                    </div>
+                    
+                    <div class="mb-6 p-6 bg-dark bg-opacity-50 rounded-lg border border-secondary border-opacity-20">
+                        <h4 class="text-xl font-bold mb-4 text-white">卦象分析</h4>
+                        <p class="text-gray-300">您的卦象为：<span class="text-secondary font-bold">${randomHexagram}</span></p>
+                    </div>
+                    
+                    <div class="mb-6 p-6 bg-dark bg-opacity-50 rounded-lg border border-secondary border-opacity-20">
+                        <h4 class="text-xl font-bold mb-4 text-white">运势解读</h4>
+                        <p class="text-gray-300">${reading}</p>
+                    </div>
+                    
+                    <div class="mb-6 p-6 bg-dark bg-opacity-50 rounded-lg border border-secondary border-opacity-20">
+                        <h4 class="text-xl font-bold mb-4 text-white">建议与指导</h4>
+                        <p class="text-gray-300">${advice}</p>
+                    </div>
+                    
+                    <div class="flex justify-between mt-8">
+                        <button class="btn-secondary px-6 py-2 rounded-full" onclick="saveResult('zhouyi')">
+                            <i class="fas fa-save mr-2"></i> 保存结果
+                        </button>
+                        <button class="btn-primary px-6 py-2 rounded-full" onclick="shareResult('zhouyi')">
+                            <i class="fas fa-share-alt mr-2"></i> 分享结果
+                        </button>
+                    </div>
+                `;
+                
+                result.classList.add('show');
+            }, 2000);
+        }
+        
+        // 生成梅花易数结果
+        function generateMeihuaResult() {
+            const modal = document.getElementById('meihua-modal');
+            const result = document.getElementById('meihua-result');
+            const selectedModel = modal.querySelector('.model-option.selected');
+            
+            if (!selectedModel) {
+                alert('请选择一个AI模型');
+                return;
+            }
+            
+            // 显示加载动画
+            result.style.display = 'block';
+            result.innerHTML = `
+                <div class="text-center py-10">
+                    <div class="loading-animation mx-auto mb-6">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <p class="text-xl text-gray-300">正在使用 ${selectedModel.textContent} 生成结果，请稍候...</p>
+                </div>
+            `;
+            
+            // 模拟API调用延迟
+            setTimeout(() => {
+                // 生成随机卦象
+                const hexagrams = [
+                    '乾为天', '坤为地', '水雷屯', '山水蒙', '水天需', '天水讼', '地水师', '水地比',
+                    '风天小畜', '天泽履', '地天泰', '天地否', '天火同人', '火天大有', '地山谦', '雷地豫',
+                    '泽雷随', '山风蛊', '地泽临', '风地观', '火雷噬嗑', '山火贲', '山地剥', '地雷复',
+                    '天雷无妄', '山天大畜', '山雷颐', '泽风大过', '坎为水', '离为火', '泽山咸', '雷风恒'
+                ];
+                
+                const randomHexagram = hexagrams[Math.floor(Math.random() * hexagrams.length)];
+                
+                // 根据选择的模型生成不同风格的解读
+                let reading = '';
+                let advice = '';
+                
+                switch (selectedModel.dataset.model) {
+                    case 'gemini':
+                        reading = `根据梅花易数起卦，您得到了"${randomHexagram}"卦。此卦显示您近期的运势较为平稳，但也存在一些潜在的变化。在工作上，您可能会遇到一些小的挑战，但只要保持专注和耐心，就能顺利解决。`;
+                        advice = `建议您在近期保持低调，不要急于求成。在做决定之前，要充分考虑各种因素，并听取他人的意见。同时，也要注意保持身心健康，避免过度劳累。`;
+                        break;
+                    case 'doubao':
+                        reading = `"${randomHexagram}"卦象表明，您近期的运势较好，特别是在人际关系方面会有不错的发展。工作上可能会得到同事和上级的支持和帮助，有利于项目的顺利进行。`;
+                        advice = `建议您抓住当前的有利时机，积极参与各种社交活动，拓展自己的人脉圈。在工作中，要勇于表达自己的想法和观点，这样才能让更多人了解您的能力和价值。`;
+                        break;
+                    case 'zhipu':
+                        reading = `从梅花易数的"${randomHexagram}"卦象来看，您近期可能会面临一些选择和决策。这些选择可能会对您的未来产生重要影响，需要谨慎对待。在感情方面，可能会出现一些新的发展或变化。`;
+                        advice = `建议您在做出决策之前，要充分了解情况，并权衡利弊。同时，也要相信自己的直觉和判断，不要轻易被他人的意见所左右。在感情方面，要保持真诚和坦率，这样才能建立健康稳定的关系。`;
+                        break;
+                    case 'wenxin':
+                        reading = `"${randomHexagram}"卦象显示，您近期的财运不错，可能会有一些意外的收入或机会。在工作上，您的努力和付出会得到相应的回报，有望获得晋升或加薪的机会。`;
+                        advice = `建议您合理规划自己的财务，不要过度消费或投资。在工作中，要继续保持积极的态度和高效的执行力，这样才能获得更多的认可和机会。同时，也要学会分享和感恩，这样才能保持良好的人际关系。`;
+                        break;
+                    case 'deepseek':
+                        reading = `根据梅花易数的"${randomHexagram}"卦象分析，您近期的运势起伏较大，需要做好应对各种情况的准备。在工作和生活中，可能会遇到一些意想不到的挑战和机遇，需要保持灵活和适应能力。`;
+                        advice = `建议您保持开放的心态，勇敢面对各种变化和挑战。在遇到困难时，要保持冷静和理性，寻找解决问题的方法。同时，也要善于抓住机遇，充分发挥自己的优势和潜能。`;
+                        break;
+                    default:
+                        reading = `从梅花易数的"${randomHexagram}"卦象来看，您近期的运势总体平稳，但也需要注意一些细节和变化。在工作和生活中，要保持警觉和敏感，及时发现和应对各种问题。`;
+                        advice = `建议您保持积极乐观的心态，相信自己的能力和价值。在面对挑战和困难时，要坚持不懈，勇往直前。同时，也要学会放松和休息，保持身心健康。`;
+                }
+                
+                // 更新结果内容
+                result.innerHTML = `
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold text-secondary">测算结果</h3>
+                        <p class="text-gray-300 mt-2">使用 ${selectedModel.textContent} 生成的梅花易数解读</p>
+                    </div>
+                    
+                    <div class="mb-6 p-6 bg-dark bg-opacity-50 rounded-lg border border-secondary border-opacity-20">
+                        <h4 class="text-xl font-bold mb-4 text-white">卦象分析</h4>
+                        <p class="text-gray-300">您的卦象为：<span class="text-secondary font-bold">${randomHexagram}</span></p>
+                    </div>
+                    
+                    <div class="mb-6 p-6 bg-dark bg-opacity-50 rounded-lg border border-secondary border-opacity-20">
+                        <h4 class="text-xl font-bold mb-4 text-white">运势解读</h4>
+                        <p class="text-gray-300">${reading}</p>
+                    </div>
+                    
+                    <div class="mb-6 p-6 bg-dark bg-opacity-50 rounded-lg border border-secondary border-opacity-20">
+                        <h4 class="text-xl font-bold mb-4 text-white">建议与指导</h4>
+                        <p class="text-gray-300">${advice}</p>
+                    </div>
+                    
+                    <div class="flex justify-between mt-8">
+                        <button class="btn-secondary px-6 py-2 rounded-full" onclick="saveResult('meihua')">
+                            <i class="fas fa-save mr-2"></i> 保存结果
+                        </button>
+                        <button class="btn-primary px-6 py-2 rounded-full" onclick="shareResult('meihua')">
+                            <i class="fas fa-share-alt mr-2"></i> 分享结果
+                        </button>
+                    </div>
+                `;
+                
+                result.classList.add('show');
+            }, 2000);
+        }
+        
+        // 生成塔罗牌结果
+        function generateTarotResult() {
+            const modal = document.getElementById('tarot-modal');
+            const result = document.getElementById('tarot-result');
+            const selectedModel = modal.querySelector('.model-option.selected');
+            const cardSelect = document.querySelector('#tarot-form select');
+            
+            if (!selectedModel) {
+                alert('请选择一个AI模型');
+                return;
+            }
+            
+            // 显示加载动画
+            result.style.display = 'block';
+            result.innerHTML = `
+                <div class="text-center py-10">
+                    <div class="loading-animation mx-auto mb-6">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <p class="text-xl text-gray-300">正在使用 ${selectedModel.textContent} 抽取塔罗牌，请稍候...</p>
+                </div>
+            `;
+            
+            // 模拟API调用延迟
+            setTimeout(() => {
+                // 塔罗牌数据
+                const tarotCards = [
+                    { name: '魔术师', meaning: '创造力、技能、自信、计划的开始' },
+                    { name: '女祭司', meaning: '直觉、潜意识、内在知识、神秘' },
+                    { name: '皇后', meaning: '丰饶、创造、母性、自然、艺术' },
+                    { name: '皇帝', meaning: '权威、结构、领导力、稳定' },
+                    { name: '教皇', meaning: '传统、信仰、指导、教育' },
+                    { name: '恋人', meaning: '选择、关系、爱情、和谐' },
+                    { name: '战车', meaning: '意志、控制、成功、胜利' },
+                    { name: '力量', meaning: '勇气、耐心、内在力量、控制' },
+                    { name: '隐士', meaning: '内省、孤独、智慧、指导' },
+                    { name: '命运之轮', meaning: '变化、命运、循环、机会' },
+                    { name: '正义', meaning: '公平、平衡、法律、因果' },
+                    { name: '倒吊人', meaning: '牺牲、等待、新视角、转变' },
+                    { name: '死神', meaning: '结束、转变、重生、变革' },
+                    { name: '节制', meaning: '平衡、调和、中庸、耐心' },
+                    { name: '恶魔', meaning: '诱惑、束缚、欲望、物质主义' },
+                    { name: '塔', meaning: '突然变化、崩溃、觉醒、释放' },
+                    { name: '星星', meaning: '希望、灵感、梦想、精神指引' },
+                    { name: '月亮', meaning: '潜意识、情绪、幻觉、恐惧' },
+                    { name: '太阳', meaning: '喜悦、成功、活力、真相' },
+                    { name: '审判', meaning: '觉醒、评估、重生、宽恕' },
+                    { name: '世界', meaning: '完成、成功、统一、实现' }
+                ];
+                
+                // 根据牌阵选择抽取的牌数
+                let cardCount = 1;
+                switch (cardSelect.value) {
+                    case 'three':
+                        cardCount = 3;
+                        break;
+                    case 'celtic':
+                        cardCount = 10;
+                        break;
+                    case 'relationship':
+                        cardCount = 7;
+                        break;
+                }
+                
+                // 随机抽取牌
+                const selectedCards = [];
+                const usedIndices = new Set();
+                
+                while (selectedCards.length < cardCount && usedIndices.size < tarotCards.length) {
+                    const randomIndex = Math.floor(Math.random() * tarotCards.length);
+                    if (!usedIndices.has(randomIndex)) {
+                        usedIndices.add(randomIndex);
+                        selectedCards.push({
+                            ...tarotCards[randomIndex],
+                            reversed: Math.random() > 0.7 // 30%的概率牌是倒的
+                        });
+                    }
+                }
+                
+                // 根据选择的模型生成不同风格的解读
+                let reading = '';
+                let advice = '';
+                
+                switch (selectedModel.dataset.model) {
+                    case 'gemini':
+                        reading = `您抽取的塔罗牌显示，近期您的生活将迎来一些重要的变化和机遇。这些变化可能与您的职业、感情或个人成长有关。牌面整体呈现出积极的能量，但也暗示您需要保持警觉和准备。`;
+                        advice = `建议您保持开放的心态，勇敢面对生活中的各种可能性。在做决定时，要倾听自己的内心声音，同时也要考虑现实因素。记住，每一个选择都会带来相应的结果，要对自己的选择负责。`;
+                        break;
+                    case 'doubao':
+                        reading = `您的塔罗牌解读显示，近期您在人际关系方面会有不错的发展。您可能会遇到一些志同道合的人，或者与老朋友重新建立联系。在工作上，您的创意和想法会得到认可和支持。`;
+                        advice = `建议您积极参与各种社交活动，拓展自己的人脉圈。在与他人交往时，要保持真诚和坦率，这样才能建立深厚的友谊和合作关系。同时，也要注意倾听他人的意见和建议，这样才能获得更多的启发和帮助。`;
+                        break;
+                    case 'zhipu':
+                        reading = `从您抽取的塔罗牌来看，近期您可能会面临一些挑战和困难。这些挑战可能与您的工作、感情或个人生活有关，但它们也是成长和学习的机会。牌面暗示您需要保持耐心和毅力，才能克服这些困难。`;
+                        advice = `建议您在面对挑战时保持冷静和理性，不要轻易放弃。同时，也要学会寻求帮助和支持，不要独自承担所有压力。记住，每一个困难都是成长的机会，通过克服这些困难，您会变得更加坚强和成熟。`;
+                        break;
+                    case 'wenxin':
+                        reading = `您的塔罗牌解读显示，近期您的财运和事业运势较好。您可能会有一些新的收入来源或职业发展机会。在感情方面，如果您已有伴侣，则关系会更加稳定和和谐；如果您单身，则可能会遇到理想的对象。`;
+                        advice = `建议您抓住当前的有利时机，积极追求自己的目标和梦想。在工作中，要勇于展示自己的能力和才华；在感情中，要学会表达自己的感受和需求。同时，也要保持谦虚和感恩的心态，珍惜当前拥有的一切。`;
+                        break;
+                    case 'deepseek':
+                        reading = `从您抽取的塔罗牌来看，近期您的生活可能会出现一些意想不到的变化和转折。这些变化可能会让您感到不安或困惑，但它们也是新的开始和机会。牌面暗示您需要保持灵活和适应能力，才能更好地应对这些变化。`;
+                        advice = `建议您保持开放的心态，勇敢面对生活中的各种可能性。在变化面前，不要过于固执或保守，要学会调整自己的计划和期望。同时，也要相信自己的直觉和判断，跟随内心的指引前进。`;
+                        break;
+                    default:
+                        reading = `您的塔罗牌解读显示，近期您的生活整体平稳，但也存在一些潜在的变化和机会。牌面暗示您需要保持警觉和敏感，及时发现和把握这些机会。`;
+                        advice = `建议您保持积极乐观的心态，相信自己的能力和价值。在面对选择和决策时，要充分考虑各种因素，并相信自己的判断。同时，也要学会放松和享受生活，不要过于焦虑或紧张。`;
+                }
+                
+                // 生成牌阵HTML
+                let cardsHtml = '';
+                if (cardSelect.value === 'three') {
+                    cardsHtml = `
+                        <div class="text-center mb-4">
+                            <p class="text-gray-300">过去 - 现在 - 未来</p>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4">
+                            ${selectedCards.map((card, index) => `
+                                <div class="text-center">
+                                    <div class="w-32 h-48 mx-auto mb-2 bg-primary bg-opacity-20 rounded-lg flex items-center justify-center ${card.reversed ? 'transform rotate-180' : ''}">
+                                        <span class="text-secondary font-bold">${card.name}</span>
+                                    </div>
+                                    <p class="text-sm text-gray-300">${index === 0 ? '过去' : index === 1 ? '现在' : '未来'}</p>
+                                    <p class="text-xs text-gray-400">${card.meaning} ${card.reversed ? '(逆位)' : ''}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else if (cardSelect.value === 'relationship') {
+                    cardsHtml = `
+                        <div class="text-center mb-4">
+                            <p class="text-gray-300">爱情牌阵</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-7 gap-2">
+                            ${selectedCards.map((card, index) => `
+                                <div class="text-center">
+                                    <div class="w-24 h-36 mx-auto mb-2 bg-primary bg-opacity-20 rounded-lg flex items-center justify-center ${card.reversed ? 'transform rotate-180' : ''}">
+                                        <span class="text-secondary font-bold text-sm">${card.name}</span>
+                                    </div>
+                                    <p class="text-xs text-gray-300">${index + 1}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else if (cardSelect.value === 'celtic') {
+                    cardsHtml = `
+                        <div class="text-center mb-4">
+                            <p class="text-gray-300">凯尔特十字牌阵</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-2">
+                            <div class="col-span-1 md:col-span-5 flex justify-center">
+                                <div class="w-32 h-48 mx-2 bg-primary bg-opacity-20 rounded-lg flex items-center justify-center ${selectedCards[0]?.reversed ? 'transform rotate-180' : ''}">
+                                    <span class="text-secondary font-bold">${selectedCards[0]?.name}</span>
+                                </div>
+                                <div class="w-32 h-48 mx-2 bg-primary bg-opacity-20 rounded-lg flex items-center justify-center transform rotate-90 ${selectedCards[1]?.reversed ? 'transform rotate-270' : ''}">
+                                    <span class="text-secondary font-bold">${selectedCards[1]?.name}</span>
+                                </div>
+                            </div>
+                            <div class="col-span-1 md:col-span-5 flex justify-center">
+                                ${selectedCards.slice(2, 6).map((card, index) => `
+                                    <div class="w-24 h-36 mx-1 bg-primary bg-opacity-20 rounded-lg flex items-center justify-center ${card.reversed ? 'transform rotate-180' : ''}">
+                                        <span class="text-secondary font-bold text-sm">${card.name}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="col-span-1 md:col-span-5 flex justify-center">
+                                ${selectedCards.slice(6).map((card, index) => `
+                                    <div class="w-24 h-36 mx-1 bg-primary bg-opacity-20 rounded-lg flex items-center justify-center ${card.reversed ? 'transform rotate-180' : ''}">
+                                        <span class="text-secondary font-bold text-sm">${card.name}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // 单牌
+                    cardsHtml = `
+                        <div class="text-center">
+                            <div class="w-48 h-72 mx-auto mb-4 bg-primary bg-opacity-20 rounded-lg flex items-center justify-center ${selectedCards[0]?.reversed ? 'transform rotate-180' : ''}">
+                                <span class="text-secondary font-bold text-2xl">${selectedCards[0]?.name}</span>
+                            </div>
+                            <p class="text-gray-300">${selectedCards[0]?.meaning} ${selectedCards[0]?.reversed ? '(逆位)' : ''}</p>
+                        </div>
+                    `;
+                }
+                
+                // 更新结果内容
+                result.innerHTML = `
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold text-secondary">占卜结果</h3>
+                        <p class="text-gray-300 mt-2">使用 ${selectedModel.textContent} 生成的塔罗牌解读</p>
+                    </div>
+                    
+                    <div class="mb-6 p-6 bg-dark bg-opacity-50 rounded-lg border border-secondary border-opacity-20">
+                        <h4 class="text-xl font-bold mb-4 text-white">抽取的牌</h4>
+                        <div id="tarot-cards">
+                            ${cardsHtml}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6 p-6 bg-dark bg-opacity-50 rounded-lg border border-secondary border-opacity-20">
+                        <h4 class="text-xl font-bold mb-4 text-white">综合解读</h4>
+                        <p class="text-gray-300">${reading}</p>
+                    </div>
+                    
+                    <div class="mb-6 p-6 bg-dark bg-opacity-50 rounded-lg border border-secondary border-opacity-20">
+                        <h4 class="text-xl font-bold mb-4 text-white">建议与指导</h4>
+                        <p class="text-gray-300">${advice}</p>
+                    </div>
+                    
+                    <div class="flex justify-between mt-8">
+                        <button class="btn-secondary px-6 py-2 rounded-full" onclick="saveResult('tarot')">
+                            <i class="fas fa-save mr-2"></i> 保存结果
+                        </button>
+                        <button class="btn-primary px-6 py-2 rounded-full" onclick="shareResult('tarot')">
+                            <i class="fas fa-share-alt mr-2"></i> 分享结果
+                        </button>
+                    </div>
+                `;
+                
+                result.classList.add('show');
+            }, 2000);
+        }
+        
+        // 保存结果
+        function saveResult(type) {
+            // 模拟保存功能
+            alert('结果已保存到您的账户！');
+        }
+        
+        // 分享结果
+        function shareResult(type) {
+            // 模拟分享功能
+            if (navigator.share) {
+                navigator.share({
+                    title: '知命阁 - 命理分析结果',
+                    text: '我在知命阁获取了专业的命理分析，快来看看吧！',
+                    url: window.location.href
+                });
+            } else {
+                // 复制链接到剪贴板
+                const url = window.location.href;
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('链接已复制到剪贴板，您可以分享给朋友了！');
+                });
+            }
+        }
+    </script>
+</body>
+</html>
