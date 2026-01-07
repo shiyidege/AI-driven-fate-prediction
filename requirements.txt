@@ -1,8 +1,13 @@
+# 基础依赖
 streamlit>=1.30.0
 openai>=1.0.0
 pydantic>=2.0.0
-# 新增缺失的依赖（解决 langchain_chroma 导入失败）
-langchain>=0.1.0
-langchain-chroma>=0.1.0
-chromadb>=0.4.0
-langchain-community>=0.0.20  # 若 rag_chain 中用到 langchain 其他模块，需补充
+
+# LangChain 全量核心依赖（解决所有 langchain_* 导入问题）
+langchain>=0.1.10
+langchain-core>=0.1.28
+langchain-community>=0.0.29
+langchain-openai>=0.1.0  # 解决 ChatOpenAI 导入
+langchain-chroma>=0.1.1  # 解决 Chroma 导入
+chromadb>=0.4.24         # Chroma 数据库核心依赖
+python-dotenv>=1.0.1     # 可选（若用到环境变量）
